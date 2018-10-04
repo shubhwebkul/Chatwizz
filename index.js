@@ -8,7 +8,7 @@ const nodemailer = require('nodemailer');
 var eventEmitter = new events.EventEmitter();
 const fileSystem = require('fs');           // interact with other files
 
-const port = 8080;
+const port = 4000;
 var responseCode = 200;
 var content = "Hello World";
 
@@ -67,25 +67,27 @@ var content = "Hello World";
     }
 
     // Read html file
-    readIndex = (() => {
-        var counter = 0;
-        console.log('call')
-        return fileSystem.readFile('index.html', (error, data) => {
-            console.log('callback: ', data);
+    // readIndex = (() => {
+    //     var counter = 0;
+    //     console.log('call')
+    //     return fileSystem.readFile('index.html', (error, data) => {
+    //         console.log('callback: ', data);
 
-            return 0;
-        })
-    });
+    //         return 0;
+    //     })
+    // });
 
 console.log("Your server is running on- localhost:" + port);
 var server = http.createServer((req, res) => {
     if(req.url != "/favicon.ico") {
-        
+        res.writeHead(responseCode, {'Content-Type': 'text/html'});
         let q = url.parse(req.url, true)
         console.log(q.href);
         if(q.href == "/") {
-            let data = readIndex();
-            console.log('init:', data);
+            fileSystem.readFile('index.html', (error, data) => {
+                if(error) throw error;
+                res.write(data);
+            })
         } else if(q.href == "/summer") {
             eventEmitter.emit('scream');        //Fire the 'scream' event:
         } else if(q.href == "/sendmail") {
@@ -95,16 +97,21 @@ var server = http.createServer((req, res) => {
             dbOperation(q.href.substr("database".length + 2));
         }
 
-        res.writeHead(responseCode, {'Content-Type': 'text/html'});
-        res.write(content);
-
-        // res.write(content);
-        res.end();
+        setTimeout(() => {
+            res.end();
+        }, 2000);
     }
 }).listen(port);
 
 var io = socket(server);
 
 io.on('connection', (socket) => {
-    console.log("made socket connection");
+    console.log("a user connected");
+    socket.on("chat", (data) => {
+        io.sockets.emit("chat", data);
+    })
+
+    socket.on("typing", (data) => {
+        socket.broadcast.emit("typing", data);
+    })
 });

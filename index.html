@@ -2,8 +2,52 @@
 <html>
     <head>
         <title>Node.js</title>
+        <link href="/styles.css" rel="stylesheet" />
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.7.3/socket.io.js"></script>
     </head>
     <body>
-        Hello World!
+        <div id="mario-chat">
+            <h2>Webkul ChatBoard</h2>
+            <div id="chat-window">
+                <div id="output"></div>
+                <div id="feedback"></div>
+            </div>
+            <input id="handle" type="text" placeholder="your name" />
+            <input id="message" type="text" placeholder="Message" />
+            <button id="send">Send</button>
+        </div>
+        <script type="text/javascript">
+            var socket = io();
+
+            let message = document.getElementById('message');
+            let handle = document.getElementById('handle');
+            let btn = document.getElementById('send');
+            let output = document.getElementById('output');
+            let feedback = document.getElementById('feedback');
+
+            // Emit Events
+            btn.addEventListener('click', () => {
+                socket.emit("chat", {
+                    "message": message.value,
+                    "handle": handle.value
+                });
+                handle.value = "";
+                message.value = "";
+            })
+
+            message.addEventListener('keypress', () => {
+                socket.emit("typing", handle.value ? handle.value : "unknown");
+            })
+
+            // Listen for events
+            socket.on("chat", (data) => {
+                feedback.innerHTML = "";
+                output.innerHTML += "<p><strong>" + data.handle + ":</strong>" + data.message +"<p>";
+            })
+
+            socket.on("typing", (data) => {
+                feedback.innerHTML = "<span><i><strong>" + data + "</strong> is typing a message...</i></span>";
+            })
+        </script>
     </body>
 </html>
