@@ -1,29 +1,21 @@
-const co = require('co');
 const fs = require('fs');           // interact with other files
+const co = require('co');
 const url = require('url');
-const util = require('util');
 const http = require('http');
 const mysql = require('mysql');
-const events = require('events');
 const socket = require('socket.io');
 const nodemailer = require('nodemailer');
-// require("https://google.github.io/traceur-compiler/bin/traceur.js");
-// require("https://google.github.io/traceur-compiler/bin/BrowserSystem.js");
-// require("https://google.github.io/traceur-compiler/src/bootstrap.js");
+const subscriber = require('subscriber.js');
 
-
+const events = require('events');
 var eventEmitter = new events.EventEmitter();
+
+const util = require('util');
 var readFileAsync = util.promisify(fs.readFile);
 
 const port = 4000;
 var responseCode = 200;
 var content = "Hello World";
-
-// Event Related
-    //Create an event handler:
-    var summerCall = () => console.log('Temp - 42c!');
-    //Assign the event handler to an event:
-    eventEmitter.on('scream', summerCall);
 
 // Email Related
     var transporter = nodemailer.createTransport({
@@ -79,51 +71,25 @@ var content = "Hello World";
     //     return yield readFileAsync('index.html');
     // });
 
-    readIndex = function*() {
-        yield setTimeout(() => {
-            console.log('settimeout over');
-        }, 2000);
-        yield console.log('sdsd');
+    function *readIndex() {
+        yield readFileAsync('index.html');
     };
 
     // readIndex = (() => new Promise((resolve, reject) => {
     //     resolve("sdf");
     // }));
-console.log("Your server is running on- localhost:" + port);
-var server = http.createServer(async (req, res) => {
-    if(req.url != "/favicon.ico") {
-        res.writeHead(responseCode, {'Content-Type': 'text/html'});
-        let q = url.parse(req.url, true)
-        if(q.href == "/") {
-            console.log('called');
-            var gen = readIndex();
-            await gen.next();
-            await gen.next();
-            // console.log(data.value);
-            
-            // if(!data) {
-            //     console.log('error');
-            //     eventEmitter.emit('error', new Error('This will crash'));
-            // }
-            // res.write(data.value)
-            // data.then((file_info) => {
-            //     console.log(file_info);
-            // })
-            console.log("Sdfsdf");
-            res.write("dfg");
-            res.end();
-        } else if(q.href == "/summer") {
-            eventEmitter.emit('scream');        //Fire the 'scream' event:
-        } else if(q.href == "/sendmail") {
-            // send email
-            sendMail();
-        } else if(q.href.includes("database")) {
-            dbOperation(q.href.substr("database".length + 2));
-        }
-    }
-}).listen(port);
 
-var io = socket(server);
+// Instantiate the HTTP server
+var httpServer = http.createServer((req, res) => {
+    handleRequest(req, res)
+});
+
+// Start the HTTP server
+httpServer.listen(port, () => {
+    console.log('The server is listening on - localhost:' + port);
+})
+
+var io = socket(httpServer);
 
 io.on('connection', (socket) => {
     console.log("a user connected");
@@ -135,3 +101,54 @@ io.on('connection', (socket) => {
         socket.broadcast.emit("typing", data);
     })
 });
+
+var handleRequest = (req, res) => {
+    // Get the url and parse it
+    var parsedUrl = url.parse(req.url, true);
+
+    // Get the path
+    var path = parsedUrl.pathname;
+    var trimmedPath = path.replace(/^\/+|\/+$/g, '');
+
+    // Get the query string as an object
+    var queryStringObject = parsedUrl.query;
+
+    // Get the HTTP method
+    var method = req.method.toLowerCase();
+
+    // Get the headers as an object
+    var headers = req.headers;
+
+
+    req.on('called', (data) => {
+        console.log('called');
+    })
+    
+    if(trimmedPath != "favicon.ico") {
+        res.writeHead(responseCode, {'Content-Type': 'text/html'});
+        if(trimmedPath == "") {
+            var gen = readIndex();
+            var data = gen.next().value;
+
+            if(data && data.then) {
+                data.then((file_data) => {
+                    res.write(file_data);
+                    res.end();
+                })
+            }
+        } else if(trimmedPath == "summer") {
+            eventEmitter.emit('scream');        //Fire the 'scream' event:
+            res.write(content);
+            res.end();
+        } else if(trimmedPath == "sendmail") {
+            // send email
+            sendMail();
+            res.write(content);
+            res.end();
+        } else if(trimmedPath.includes("database")) {
+            dbOperation(trimmedPath.substr("database".length + 1));
+            res.write(content);
+            res.end();
+        }
+    }
+}
