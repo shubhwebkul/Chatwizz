@@ -115,3 +115,5 @@ io.on('connection', (socket) => {
         socket.broadcast.emit("typing", data);
     })
 });
+
+exports.server = server;
