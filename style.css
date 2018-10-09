@@ -67,3 +67,15 @@ button{
     width: 100%;
     border-radius: 0 0 2px 2px;
 }
+
+.dis-in-bl {
+    display: inline-block;
+}
+
+.user-status {
+    display: inline-block;
+    background-color: green;
+    width: 15px;
+    height: 15px;
+    border-radius: 50%;
+}

@@ -7,10 +7,10 @@
     </head>
     <body>
         <div id="mario-chat">
-            <h2>Webkul ChatBoard</h2>
+            <h2 class="dis-in-bl">Webkul ChatBoard</h2><div class="dis-in-bl"></div>
             <div id="chat-window">
-                <div id="output"></div>
                 <div id="feedback"></div>
+                <div id="output"></div>
             </div>
             <input id="handle" type="text" placeholder="your name" />
             <input id="message" type="text" placeholder="Message" />
@@ -27,12 +27,15 @@
 
             // Emit Events
             btn.addEventListener('click', () => {
-                socket.emit("chat", {
-                    "message": message.value,
-                    "handle": handle.value
-                });
-                handle.value = "";
-                message.value = "";
+                if(handle.value && message.value) {
+                    socket.emit("chat", {
+                        "handle": handle.value,
+                        "message": message.value,
+                    });
+                    message.value = "";
+                } else {
+                    alert("Invalid entries");
+                }
             })
 
             message.addEventListener('keypress', () => {
@@ -42,11 +45,11 @@
             // Listen for events
             socket.on("chat", (data) => {
                 feedback.innerHTML = "";
-                output.innerHTML += "<p><strong>" + data.handle + ":</strong>" + data.message +"<p>";
+                output.innerHTML += "<p><strong>" + data.handle + ":</strong>" + data.message +"</p>";
             })
 
             socket.on("typing", (data) => {
-                feedback.innerHTML = "<span><i><strong>" + data + "</strong> is typing a message...</i></span>";
+                feedback.innerHTML = "<p><i><strong>" + data + "</strong> is typing a message...</i></p>";
             })
         </script>
     </body>
