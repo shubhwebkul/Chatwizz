@@ -1,8 +1,10 @@
-const IOSocket = require('./io.js');
-const mailer = require('./mailer.js');
+"use strict"
+
+const IOSocket = require('./src/io.js');
+const mailer = require('./src/mailer.js');
 const EventEmitter = require('events');
-const shared = require('./sharable.js');
-const DBOperation = require('./database.js');
+const shared = require('./src/sharable.js');
+const DBOperation = require('./src/database.js');
 
 class Subscriber extends EventEmitter
 {

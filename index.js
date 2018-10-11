@@ -1,8 +1,8 @@
 "use strict"
 
-const IO = require('./io.js');
-const shared = require('./sharable.js');
-const subscriber = require('./subscriber.js');
+const IO = require('./src/io.js');
+const shared = require('./src/sharable.js');
+const subscriber = require('./src/subscriber.js');
 
 const express = require('express');
 const app = express();
@@ -12,7 +12,7 @@ new IO(server);
 
 app.set('view-engine', 'jade');
 
-app.get(['/summer', '/winter', '/database', '/sendmail', '/chatwizz'], (req, res) => {
+app.get(shared.routes, (req, res) => {
     let fields = sharedgetRequiredFieldsFromUrl(req);
     let trimmedPath = fields.trimmedPath;
     let queryParams = fields.queryParams;

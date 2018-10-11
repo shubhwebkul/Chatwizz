@@ -1,3 +1,5 @@
+"use strict"
+
 const socket = require('socket.io');
 
 class IOSocket
@@ -21,5 +23,6 @@ class IOSocket
         });
     }
 }
+console.log('sds');
 
 module.exports = IOSocket;
