@@ -1,8 +1,9 @@
 "use strict"
 
-const IO = require('./src/io.js');
-const shared = require('./src/sharable.js');
-const subscriber = require('./src/subscriber.js');
+const path = require('path');
+const IO = require('./io.js');
+const shared = require('./sharable.js');
+const subscriber = require('./subscriber.js');
 
 const express = require('express');
 const app = express();
@@ -10,15 +11,13 @@ const app = express();
 const server = require('http').Server(app);
 new IO(server);
 
-app.set('view-engine', 'jade');
-
 app.get(shared.routes, (req, res) => {
-    let fields = sharedgetRequiredFieldsFromUrl(req);
+    let fields = shared.getRequiredFieldsFromUrl(req);
     let trimmedPath = fields.trimmedPath;
     let queryParams = fields.queryParams;
 
     subscriber.emit(trimmedPath, queryParams);
-    if(trimmedPath == 'chatwizz') res.sendFile(path.join(__dirname+'/public/index.html'));
+    if(trimmedPath) res.sendFile(path.join(__dirname+'/templates/' + trimmedPath + '.html'));
     else res.send(subscriber.eventResponse);
 })
 

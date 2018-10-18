@@ -3,7 +3,7 @@
 const url = require('url');
 
 var port = 7000;
-var routes = ['/summer', '/winter', '/database', '/sendmail', '/chatwizz'];
+var routes = ['/', '/summer', '/winter', '/database', '/sendmail', '/chatwizz'];
 // Error Handler for promises
 var withErrorHandler = (fn) => fn.catch((error) => console.log("Error: ", error));
 

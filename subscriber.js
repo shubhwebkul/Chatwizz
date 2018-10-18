@@ -1,10 +1,10 @@
 "use strict"
 
-const IOSocket = require('./src/io.js');
-const mailer = require('./src/mailer.js');
+const IOSocket = require('./io.js');
+const mailer = require('./mailer.js');
 const EventEmitter = require('events');
-const shared = require('./src/sharable.js');
-const DBOperation = require('./src/database.js');
+const shared = require('./sharable.js');
+const DBOperation = require('./database.js');
 
 class Subscriber extends EventEmitter
 {
@@ -43,15 +43,11 @@ class Subscriber extends EventEmitter
     }
     
     async homePage(queryObject, httpServer) {
-        const io = new IOSocket(httpServer);
-        await io.render().then((file_data) => {
-            res.write(file_data);
-            res.end();
-        })
+        console.log('called');
     }
 }
 
-subscriber = new Subscriber();
+var subscriber = new Subscriber();
 subscriber.on('', subscriber.homePage);
 subscriber.on('summer', subscriber.summerCall);
 subscriber.on('winter', subscriber.winterCall);
@@ -60,5 +56,5 @@ subscriber.on('database', subscriber.dbOperation);
 
 module.exports = subscriber;
 
-watch_out = "https://www.youtube.com/watch?v=9ErAONqE6HE";
-"https://www.youtube.com/watch?v=1e4ltxBZZCA";
+// watch_out = "https://www.youtube.com/watch?v=9ErAONqE6HE";
+// "https://www.youtube.com/watch?v=1e4ltxBZZCA";

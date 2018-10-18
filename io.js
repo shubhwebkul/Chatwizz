@@ -23,6 +23,5 @@ class IOSocket
         });
     }
 }
-console.log('sds');
 
 module.exports = IOSocket;
