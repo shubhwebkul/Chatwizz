@@ -2,7 +2,7 @@
 
 const path = require('path');
 const IO = require('./io.js');
-const shared = require('./sharable.js');
+const { routes, getRequiredFieldsFromUrl, port } = require('./sharable.js');
 const subscriber = require('./subscriber.js');
 
 const express = require('express');
@@ -11,8 +11,8 @@ const app = express();
 const server = require('http').Server(app);
 new IO(server);
 
-app.get(shared.routes, (req, res) => {
-    let fields = shared.getRequiredFieldsFromUrl(req);
+app.get(routes, (req, res) => {
+    let fields = getRequiredFieldsFromUrl(req);
     let trimmedPath = fields.trimmedPath;
     let queryParams = fields.queryParams;
 
@@ -22,6 +22,6 @@ app.get(shared.routes, (req, res) => {
 })
 
 // Start the HTTP server
-server.listen(shared.port, () => {
-    console.log('The server is listening on - localhost:' + shared.port);
+server.listen(port, () => {
+    console.log('The server is listening on - localhost:' + port);
 })
